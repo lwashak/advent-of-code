@@ -1,0 +1,6 @@
+cabal.project.local
+dist-*
+.ghci
+.ghcid
+*~
+input

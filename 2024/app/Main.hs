@@ -8,7 +8,7 @@ import System.Clock (getTime, diffTimeSpec, Clock(Monotonic))
 
 
 inputDir :: String
-inputDir = "/home/luke/Code/advent/aoc2024/input/"
+inputDir = "/home/luke/Documents/code/advent-of-code/2024/input/"
 
 getDayInputFile :: Int -> String
 getDayInputFile day = let d = if day < 10 then "0" ++ show day else show day

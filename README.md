@@ -1,3 +1,2 @@
-# Advent Of Code 2024
+# Advent Of Code
 
-Haskell is fun :)

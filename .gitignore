@@ -1,6 +1,1 @@
-cabal.project.local
-dist-*
-.ghci
-.ghcid
-*~
-input
+2023/
