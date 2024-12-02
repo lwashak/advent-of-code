@@ -3,4 +3,4 @@ dist-*
 .ghci
 .ghcid
 *~
-input
+input/Day*
