@@ -13,7 +13,7 @@ getDayInputFile day = let d = if day < 10 then "0" ++ show day else show day
                       in inputDir ++ "Day" ++ d ++ ".txt"
 
 
-executeParts :: (Show a, Show b) => (String -> a) -> (String -> b) -> String -> IO ()
+executeParts :: (Show a, Show b) => (String -> a) -> (String -> b) -> c -> IO ()
 executeParts partOne partTwo input = do
     putStrLn "Part 1: "
     print partOne input
