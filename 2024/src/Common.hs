@@ -20,6 +20,7 @@ getFirstInt s =
 
 insertIntoSorted :: Int -> [Int] -> [Int]
 insertIntoSorted x [] = [x]
-insertIntoSorted x (y:ys) = if x <= y
-                            then x:y:ys
-                            else y : insertIntoSorted x ys
+insertIntoSorted x (y:ys) =
+    if x <= y
+    then x:y:ys
+    else y : insertIntoSorted x ys

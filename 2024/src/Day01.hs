@@ -1,42 +1,39 @@
-module Day01 (part1, part2) where
+module Day01 (Input, Output, parseInput, partOne, partTwo) where
 
 import qualified Common as C (getFirstInt, insertIntoSorted)
 import Data.Char (isDigit)
+import Data.List (sort, transpose)
 
+type Input = ([Int], [Int])
+type Output = Int
 
-part1 :: String -> Int
-part1 input =
-    let ls = lines input
-        (xs, ys) = parseLines ls [] []
-    in sum (getDistances xs ys)
+-- Parsing
+parseInput :: String -> Input
+parseInput = parseLines [] [] . lines
 
+parseLines :: [Int] -> [Int] -> [String] -> Input
+parseLines xs ys []     = (xs, ys)
+parseLines xs ys (l:ls) = let (x,y) = parseLine l
+                          in parseLines (C.insertIntoSorted x xs) (C.insertIntoSorted y ys) ls
 
-part2 :: String -> Int
-part2 input =
-    let ls = lines input
-        (xs, ys) = parseLines ls [] []
-    in getSimilarityScore xs ys
+parseLine :: String -> (Int, Int)
+parseLine = toPair . map read . words
+    where toPair [a, b] = (a, b)
+          toPair _      = error "Expecting 2 numbers per line"
 
+-- Solutions
+partOne :: Input -> Output
+partOne (xs, ys) = sum (getDistances xs ys)
+    where getDistances = zipWith (\x y -> abs (x - y))
 
-parseLines :: [String] -> [Int] -> [Int] -> ([Int], [Int])
-parseLines [] xs ys = (xs, ys)
-parseLines (l:ls) xs ys = case C.getFirstInt l of
-    (Nothing, _) -> error "Line should contain 2 numbers"
-    (Just x, l') -> case C.getFirstInt l' of
-        (Nothing, _) -> error "Line should contain 2 numbers"
-        (Just y, _) -> parseLines ls (C.insertIntoSorted x xs) (C.insertIntoSorted y ys)
-
-
-getDistances :: [Int] -> [Int] -> [Int]
-getDistances = zipWith (\x y -> abs (x - y))
-
+partTwo :: Input -> Output
+partTwo (xs, ys) = getSimilarityScore xs ys
 
 getSimilarityScore :: [Int] -> [Int] -> Int
 getSimilarityScore [] _ = 0
 getSimilarityScore (x:xs) ys =
     let n = getOccurancesForSorted x ys
     in (x * n) + getSimilarityScore xs ys
-
 
 getOccurancesForSorted :: Int -> [Int] -> Int
 getOccurancesForSorted _ [] = 0
