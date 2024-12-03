@@ -41,3 +41,11 @@ getOccurancesForSorted x (y:ys)
     | x > y  = getOccurancesForSorted x ys
     | x == y = 1 + getOccurancesForSorted x ys
     | x < y  = 0
+
+-- Main
+main :: IO ()
+main = do
+    raw <- readFile "../input/Day01.txt"
+    let input = parseInput raw
+    print $ partOne input
+    print $ partTwo input

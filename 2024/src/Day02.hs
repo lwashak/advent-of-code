@@ -48,3 +48,11 @@ isSafeWithDampener' prevFailure mx0 safe (x1:x2:xs)
     | otherwise   = case mx0 of
                         Just x0 -> isSafeWithDampener' True Nothing safe (x0:x2:xs) || isSafeWithDampener' True Nothing safe (x0:x1:xs)
                         Nothing -> isSafeWithDampener' True Nothing safe (x2:xs)    || isSafeWithDampener' True Nothing safe (x1:xs)
+
+-- Main
+main :: IO ()
+main = do
+    raw <- readFile "../input/Day02.txt"
+    let input = parseInput raw
+    print $ partOne input
+    print $ partTwo input
