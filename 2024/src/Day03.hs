@@ -3,7 +3,7 @@ module Day03 () where
 import Data.Char (isDigit)
 
 type Mul = [Int]
-type Input = [[Mul]]
+type Input = [Mul]
 type Output = Int
 
 -- Parsing
@@ -42,12 +42,12 @@ partTwo = execute (parseMulsWithDos True)
 
 execute :: (String -> [Mul]) -> String -> Int
 execute parser input =
-    let ms = map parser . lines $ input
-    in sum (map product (concat ms))
+    let ms = parser input
+    in sum (map product ms)
 
 -- Main
 main :: IO ()
 main = do
-    raw <- readFile "../input/example/Day03.txt"
+    raw <- readFile "../input/Day03.txt"
     print $ partOne raw
     print $ partTwo raw
