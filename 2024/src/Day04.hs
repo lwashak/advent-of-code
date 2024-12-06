@@ -1,6 +1,6 @@
 module Day04 () where
 
-import Data.List (transpose)
+import Data.List (transpose, tails)
 -- import Data.Matrix (Matrix, takeDiag, fromLists, toRows, toColumns, toLists)
 
 -- Types
@@ -64,8 +64,8 @@ findCrossMases _ = 0
 findCrossMasesInRows :: Matrix -> Int
 findCrossMasesInRows ([]:_) = 0
 findCrossMasesInRows m@(r1:r2:r3:[])
-    | isCrossMas m = 1 + findCrossMasesInRows (map (drop 1) m)
-    | otherwise    = findCrossMasesInRows (map (drop 1) m)
+    | isCrossMas m = 1 + findCrossMasesInRows (map tail m)
+    | otherwise    = findCrossMasesInRows (map tail m)
 findCrossMasesInRows _ = error "Expecting 3 rows"
 
 isCrossMas :: Matrix -> Bool

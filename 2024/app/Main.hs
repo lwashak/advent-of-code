@@ -8,30 +8,23 @@ import System.Environment (getArgs)
 inputDir :: String
 inputDir = "/home/luke/Documents/code/advent-of-code/2024/input/"
 
-getDayInputFile :: Int -> String
-getDayInputFile day = let d = if day < 10 then "0" ++ show day else show day
-                      in inputDir ++ "Day" ++ d ++ ".txt"
-
-
-executeParts :: (Show a, Show b) => (String -> a) -> (String -> b) -> c -> IO ()
-executeParts partOne partTwo input = do
-    putStrLn "Part 1: "
-    print partOne input
-    putStrLn "\nPart 2: "
-    print partTwo input
-    putStrLn ""
+getInputFile :: Int -> String
+getInputFile day = let d = if day < 10 then "0" ++ show day else show day
+                   in inputDir ++ "Day" ++ d ++ ".txt"
 
 
 main :: IO ()
 main = do
-    args <- getArgs
-    let day = if null args then error "Please provide Day" else read (head args) :: Int
-    putStrLn ("------ Day " ++ show day ++ "------")
-    let inputFile = if length args == 1 then getDayInputFile day else args!!1
-    putStrLn ("Using input file " ++ inputFile ++ "\n")
-    input <- readFile inputFile
-    case day of
-         1 -> executeParts Day01.partOne Day01.partTwo $ Day01.parseInput input
-         2 -> executeParts Day02.partOne Day02.partTwo $ Day02.parseInput input
+    putStrLn "Enter Day: "
+    day <- getLine
+    let dayInt = read day :: Int
+    let defaultFile = getInputFile dayInt
+    putStrLn $ "Enter Input File (default=" ++ show defaultFile ++ "): "
+    fileInput <- getLine
+    let file = if null fileInput then defaultFile else fileInput
+    raw <- readFile file
+    case dayInt of
+         1 -> print $ Day01.partOne $ Day01.parseInput raw
+         2 -> print $ Day02.partOne $ Day02.parseInput raw
          _ -> error "Invalid Day"
          -- TODO: can we do this dynamically?

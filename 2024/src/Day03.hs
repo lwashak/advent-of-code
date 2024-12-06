@@ -2,52 +2,69 @@ module Day03 () where
 
 import Data.Char (isDigit)
 
-type Mul = [Int]
-type Input = [Mul]
+import qualified Text.Parsec as P (string, char, digit, many, many1, choice, try, anyToken, putState, getState, manyTill, skipMany, optional, option, lookAhead, parse)
+import Text.Parsec (Parsec, (<|>))
+
+-- Types
+type Input = [Op]
 type Output = Int
 
--- Parsing
-parseMuls :: String -> [Mul]
-parseMuls "" = []
-parseMuls ('m':'u':'l':'(':cs) =
-    let (x,cs1) = span isDigit cs
-    in case cs1 of
-        (',':cs2) -> let (y,cs3) = span isDigit cs2
-                     in case cs3 of
-                             (')':cs4) -> [read x,read y] : parseMuls cs4
-                             _         -> parseMuls cs3
-        _         -> parseMuls cs1
-parseMuls (c:cs) = parseMuls cs
+data Op = Do
+        | Dont
+        | Mul Int Int
+        deriving (Show)
 
-parseMulsWithDos :: Bool -> String -> [Mul]
-parseMulsWithDos _ "" = []
-parseMulsWithDos _ ('d':'o':'(':')':cs) = parseMulsWithDos True cs
-parseMulsWithDos _ ('d':'o':'n':'\'':'t':'(':')':cs) = parseMulsWithDos False cs
-parseMulsWithDos True ('m':'u':'l':'(':cs) =
-    let (x,cs1) = span isDigit cs
-    in case cs1 of
-        (',':cs2) -> let (y,cs3) = span isDigit cs2
-                     in case cs3 of
-                             (')':cs4) -> [read x,read y] : parseMulsWithDos True cs4
-                             _         -> parseMulsWithDos True cs3
-        _         -> parseMulsWithDos True cs1
-parseMulsWithDos d (c:cs) = parseMulsWithDos d cs
+-- Parsing
+parseInput :: String -> [Op]
+parseInput [] = []
+parseInput s@(_:cs) = case P.parse operatorParser "" s of
+    Right x -> x : parseInput cs
+    _       -> parseInput cs
+
+numberParser :: Parsec String () String
+numberParser = P.many1 P.digit
+
+mulParser :: Parsec String () Op
+mulParser = do
+    _ <- P.string "mul("
+    x <- numberParser
+    _ <- P.char ','
+    y <- numberParser
+    _ <- P.char ')'
+    return $ Mul (read x) (read y)
+
+doParser :: Parsec String () Op
+doParser = do
+    P.try $ P.string "do()"
+    return Do
+
+dontParser :: Parsec String () Op
+dontParser = do
+    P.try $ P.string "don't()"
+    return Dont
+
+operatorParser :: Parsec String () Op
+operatorParser = P.choice [doParser, dontParser, mulParser]
+
 
 -- Solutions
-partOne :: String -> Int
-partOne = execute parseMuls
+partOne :: [Op] -> Int
+partOne ops = sum [ x * y | Mul x y <- ops ]
 
-partTwo :: String -> Int
-partTwo = execute (parseMulsWithDos True)
+partTwo :: Input -> Int
+partTwo = evaluateProgram True
 
-execute :: (String -> [Mul]) -> String -> Int
-execute parser input =
-    let ms = parser input
-    in sum (map product ms)
+evaluateProgram :: Bool -> [Op] -> Int
+evaluateProgram _ [] = 0
+evaluateProgram _ (Do:ops) = evaluateProgram True ops
+evaluateProgram _ (Dont:ops) = evaluateProgram False ops
+evaluateProgram True ((Mul x y):ops) = x * y + evaluateProgram True ops
+evaluateProgram enabled (_:ops) = evaluateProgram enabled ops
 
 -- Main
 main :: IO ()
 main = do
     raw <- readFile "../input/Day03.txt"
-    print $ partOne raw
-    print $ partTwo raw
+    let input = parseInput raw
+    print $ partOne input
+    print $ partTwo input

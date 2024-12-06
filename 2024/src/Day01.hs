@@ -1,9 +1,10 @@
 module Day01 (Input, Output, parseInput, partOne, partTwo) where
 
-import qualified Common as C (getFirstInt, insertIntoSorted)
+import qualified Common as C (insertIntoSorted)
 import Data.Char (isDigit)
 import Data.List (sort, transpose)
 
+-- Types
 type Input = ([Int], [Int])
 type Output = Int
 
