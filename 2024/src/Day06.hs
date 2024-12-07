@@ -1,13 +1,17 @@
 module Day06 () where
 
-import Data.List (nub)
+import Data.List (nub, find)
+import Data.Either (fromRight)
+import Data.Maybe (isJust)
 
 -- Types
 type Pos = (Int, Int)
 type Bounds = (Int, Int)
 
+type Path = [(Pos, Direction)]
+
 data Direction = N | E | S | W
-    deriving (Show, Read)
+    deriving (Show, Read, Eq)
 
 data Grid = Grid { size :: Bounds
                  , obstacles :: [Pos]
@@ -38,14 +42,19 @@ findPlayer = head . findCharInGrid '^' (0,0)
 
 -- Solutions
 partOne :: Grid -> Int
-partOne = length . nub . walk
+partOne g = case walk [] g of
+    Right vs -> length $ nub (map fst vs)
+    Left vs  -> error "Loop found"
 
-walk :: Grid -> [Pos]
-walk Grid{ obstacles=os, playerPos=p, playerDirection=d, size=s }
-    | isOutOfBounds s p' = [p]
-    | p' `elem` os       = walk Grid { obstacles=os, playerPos=p, playerDirection=turn d, size=s }
-    | otherwise          = p : walk Grid { obstacles=os, playerPos=p', playerDirection=d, size=s }
-    where p' = move d p
+walk :: [(Pos, Direction)] -> Grid -> Either Path Path
+walk visited Grid{ obstacles=os, playerPos=p, playerDirection=d, size=s }
+    | loop               = Left visited
+    | isOutOfBounds s p' = Right visited'
+    | p' `elem` os       = walk visited Grid { obstacles=os, playerPos=p, playerDirection=turn d, size=s }
+    | otherwise          = walk visited' Grid { obstacles=os, playerPos=p', playerDirection=d, size=s }
+    where loop = (p, d) `elem` visited
+          p'   = move d p
+          visited' = visited ++ [(p,d)]
 
 isOutOfBounds :: Bounds -> Pos -> Bool
 isOutOfBounds (l,h) (x,y)
@@ -65,10 +74,33 @@ turn E = S
 turn S = W
 turn W = N
 
-findPotentialLoops :: [Pos] -> [[Pos]]
-findPotentialLoops [] = []
-findPotentialLoops ((x,y):ps) = let xs = filter (\(x',y') -> x' == x) ps
-                                    ys = filter (\(x',y') -> y' == y) ps
+partTwo :: Grid -> Int
+partTwo g@Grid{ obstacles=os, playerPos=p } =
+    let path  = tail $ fromRight [] $ walk [] g
+        os'   = filter (/=p) $ getPotentialLoopObstacles os path
+        loops = filter (not . tryWalkWithObstacle g) (nub os')
+    in length loops
+
+tryWalkWithObstacle :: Grid -> Pos -> Bool
+tryWalkWithObstacle Grid{ obstacles=os, playerPos=p, playerDirection=d, size=s } o =
+    case walk [] Grid{ obstacles=(o:os), playerPos=p, playerDirection=d, size=s } of
+         Right _ -> True -- True if no loop
+         Left _  -> False
+
+getPotentialLoopObstacles :: [Pos] -> Path -> [Pos]
+getPotentialLoopObstacles _ [] = []
+getPotentialLoopObstacles _ [p] = []
+getPotentialLoopObstacles os ((p0,d0):(p1,d1):path)
+    | isJust futureObstacle = p1 : getPotentialLoopObstacles os ((p1,d1):path)
+    | otherwise = getPotentialLoopObstacles os ((p1,d1):path)
+    where futureObstacle = findInDirection (turn d0) p0 os
+
+findInDirection :: Direction -> Pos -> [Pos] -> Maybe Pos
+findInDirection N (x,y) = find (\(x',y') -> x' == x && y' < y)
+findInDirection E (x,y) = find (\(x',y') -> x' > x && y' == y)
+findInDirection S (x,y) = find (\(x',y') -> x' == x && y' > y)
+findInDirection W (x,y) = find (\(x',y') -> x' < x && y' == y)
+
 
 
 -- Main
@@ -78,4 +110,4 @@ main = do
     let input = parseInput raw
 --     print input
     print $ partOne input
---     print $ partTwo input
+    print $ partTwo input
