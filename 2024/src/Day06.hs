@@ -4,69 +4,74 @@ import Data.List (nub, find)
 import Data.Either (fromRight)
 import Data.Maybe (isJust)
 
+import Data.Set (Set)
+import qualified Data.Set as S (map, member, notMember, fromList, size, insert)
+
 -- Types
 type Pos = (Int, Int)
-type Bounds = (Int, Int)
 
-type Path = [(Pos, Direction)]
+type Path = [Pos]
 
 data Direction = N | E | S | W
     deriving (Show, Read, Eq)
 
-data Grid = Grid { size :: Bounds
-                 , obstacles :: [Pos]
-                 , playerPos :: Pos
-                 , playerDirection :: Direction
-                 } deriving (Show, Read)
+data World = World { obstacles :: Set Pos
+                   , guardPos :: Pos
+                   , guardDir :: Direction
+                   , width :: Int
+                   , height :: Int
+                   } deriving (Show, Read)
 
 -- Parsing
-parseInput :: String -> Grid
-parseInput raw = let css = lines raw
-                     os  = findObstacles css
-                     p   = findPlayer css
-                     s   = (length $ head css, length css)
-                 in Grid { size=s, obstacles=os, playerPos=p, playerDirection=N }
+parseInput :: String -> World
+parseInput raw = World obstacles guardPos guardDir width height
+    where grid      = lines raw
+          obstacles = S.fromList $ findObstacles grid
+          guardPos  = findGuard grid
+          guardDir  = N
+          width     = length $ head grid
+          height    = length grid
 
-findCharInGrid :: Char -> Pos -> [[Char]] -> [Pos]
+findCharInGrid :: Pos -> Char -> [[Char]] -> [Pos]
 findCharInGrid _ _ [] = []
-findCharInGrid t (x,y) ([]:css) = findCharInGrid t (0,y+1) css
-findCharInGrid t (x,y) ((c:cs):css)
-    | c == t    = (x,y) : findCharInGrid t (x+1, y) (cs:css)
-    | otherwise = findCharInGrid t (x+1, y) (cs:css)
+findCharInGrid (i,j) t ([]:css) = findCharInGrid (0,j+1) t css
+findCharInGrid (i,j) t ((c:cs):css)
+    | c == t    = (i,j) : findCharInGrid (i+1, j) t (cs:css)
+    | otherwise = findCharInGrid (i+1, j) t (cs:css)
 
 findObstacles :: [[Char]] -> [Pos]
-findObstacles = findCharInGrid '#' (0,0)
+findObstacles = findCharInGrid (0,0) '#'
 
-findPlayer :: [[Char]] -> Pos
-findPlayer = head . findCharInGrid '^' (0,0)
+findGuard :: [[Char]] -> Pos
+findGuard = head . findCharInGrid (0,0) '^'
+
 
 -- Solutions
-partOne :: Grid -> Int
-partOne g = case walk [] g of
-    Right vs -> length $ nub (map fst vs)
-    Left vs  -> error "Loop found"
+partOne :: World -> Int
+partOne w = length $ nub (guardPos w : walkPatrol w)
 
-walk :: [(Pos, Direction)] -> Grid -> Either Path Path
-walk visited Grid{ obstacles=os, playerPos=p, playerDirection=d, size=s }
-    | loop               = Left visited
-    | isOutOfBounds s p' = Right visited'
-    | p' `elem` os       = walk visited Grid { obstacles=os, playerPos=p, playerDirection=turn d, size=s }
-    | otherwise          = walk visited' Grid { obstacles=os, playerPos=p', playerDirection=d, size=s }
-    where loop = (p, d) `elem` visited
-          p'   = move d p
-          visited' = visited ++ [(p,d)]
+isOnEdge :: (Int, Int) -> Pos -> Bool
+isOnEdge (w, h) (i,j) = i >= w - 1 || i <= 0 || j >= h - 1 || j <= 0
 
-isOutOfBounds :: Bounds -> Pos -> Bool
-isOutOfBounds (l,h) (x,y)
-    | x > l || x < 0 = True
-    | y > h || y < 0 = True
-    | otherwise      = False
+walkStraight :: World -> Either (Path, Pos) (Path, Pos)
+walkStraight w =
+    if isOnEdge (width w, height w) lastPos
+    then Left (path, lastPos) -- If path walks off the map, return Left path
+    else Right (path, lastPos)
+        where (i, j) = guardPos w
+              obs    = obstacles w
+              line | guardDir w == N = zip (repeat i) (reverse [0 .. j-1])
+                   | guardDir w == E = zip [i+1 .. width w -1] (repeat j)
+                   | guardDir w == S = zip (repeat i) [j+1 .. height w -1]
+                   | otherwise       = zip (reverse [0 .. i-1]) (repeat j)
+              path    = takeWhile (`S.notMember` obs) line
+              lastPos = last path
 
-move :: Direction -> Pos -> Pos
-move N (x, y) = (x, y-1)
-move E (x, y) = (x+1, y)
-move S (x, y) = (x, y+1)
-move W (x, y) = (x-1, y)
+walkPatrol :: World -> Path
+walkPatrol w = case walkStraight w of
+    Left (p,_) -> p
+    Right (p, (i,j)) -> p ++ walkPatrol (World (obstacles w) (i,j) newDir (width w) (height w))
+    where newDir = turn $ guardDir w
 
 turn :: Direction -> Direction
 turn N = E
@@ -74,32 +79,50 @@ turn E = S
 turn S = W
 turn W = N
 
-partTwo :: Grid -> Int
-partTwo g@Grid{ obstacles=os, playerPos=p } =
-    let path  = tail $ fromRight [] $ walk [] g
-        os'   = filter (/=p) $ getPotentialLoopObstacles os path
-        loops = filter (not . tryWalkWithObstacle g) (nub os')
-    in length loops
+-- walk :: Set (Pos, Direction) -> World -> Either Path Path
+-- walk visited World{ obstacles=os, playerPos=p, playerDirection=d, size=s }
+--     | loop               = Left visited
+--     | isOutOfBounds s p' = Right visited'
+--     | p' `S.member` os   = walk visited World { obstacles=os, playerPos=p, playerDirection=turn d, size=s }
+--     | otherwise          = walk visited' World { obstacles=os, playerPos=p', playerDirection=d, size=s }
+--     where loop = (p, d) `S.member` visited
+--           p'   = move d p
+--           visited' = visited ++ [(p,d)]
+--
+--
+-- move :: Direction -> Pos -> Pos
+-- move N (x, y) = (x, y-1)
+-- move E (x, y) = (x+1, y)
+-- move S (x, y) = (x, y+1)
+-- move W (x, y) = (x-1, y)
 
-tryWalkWithObstacle :: Grid -> Pos -> Bool
-tryWalkWithObstacle Grid{ obstacles=os, playerPos=p, playerDirection=d, size=s } o =
-    case walk [] Grid{ obstacles=(o:os), playerPos=p, playerDirection=d, size=s } of
-         Right _ -> True -- True if no loop
-         Left _  -> False
 
-getPotentialLoopObstacles :: [Pos] -> Path -> [Pos]
-getPotentialLoopObstacles _ [] = []
-getPotentialLoopObstacles _ [p] = []
-getPotentialLoopObstacles os ((p0,d0):(p1,d1):path)
-    | isJust futureObstacle = p1 : getPotentialLoopObstacles os ((p1,d1):path)
-    | otherwise = getPotentialLoopObstacles os ((p1,d1):path)
-    where futureObstacle = findInDirection (turn d0) p0 os
 
-findInDirection :: Direction -> Pos -> [Pos] -> Maybe Pos
-findInDirection N (x,y) = find (\(x',y') -> x' == x && y' < y)
-findInDirection E (x,y) = find (\(x',y') -> x' > x && y' == y)
-findInDirection S (x,y) = find (\(x',y') -> x' == x && y' > y)
-findInDirection W (x,y) = find (\(x',y') -> x' < x && y' == y)
+-- partTwo :: World -> Int
+-- partTwo g =
+--     let path  = fromRight [] $ walk [] g
+--     in findLoops g path
+--
+-- isLoop :: World -> Bool
+-- isLoop g = case walk [] g of
+--     Left _  -> True
+--     Right _ -> False
+--
+-- findLoops :: World -> Path -> Int
+-- findLoops _ [] = 0
+-- findLoops _ [p] = 0
+-- findLoops g@World{ obstacles=os, size=s } ((p0,d0):(p1,d1):path)
+--     | isNextObstacle && isLoop g' = 1 + findLoops g ((p1,d1):path)
+--     | otherwise = findLoops g ((p1,d1):path)
+--     where isNextObstacle = isJust $ findInDirection (turn d0) p0 os
+--           os' = S.insert p1 os
+--           g' = World{ obstacles=os', playerPos=p0, playerDirection=d0, size=s}
+--
+-- findInDirection :: Direction -> Pos -> Set Pos -> Maybe Pos
+-- findInDirection N (x,y) = find (\(x',y') -> x' == x && y' < y)
+-- findInDirection E (x,y) = find (\(x',y') -> x' > x && y' == y)
+-- findInDirection S (x,y) = find (\(x',y') -> x' == x && y' > y)
+-- findInDirection W (x,y) = find (\(x',y') -> x' < x && y' == y)
 
 
 
@@ -108,6 +131,6 @@ main :: IO ()
 main = do
     raw <- readFile "../input/Day06.txt"
     let input = parseInput raw
---     print input
+    print input
     print $ partOne input
-    print $ partTwo input
+--     print $ partTwo input
