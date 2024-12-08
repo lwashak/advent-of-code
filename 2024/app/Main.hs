@@ -42,8 +42,8 @@ printResult (result, time) = do
     if length resultString > 200
        then putStrLn $ take 200 resultString ++ "..."
        else putStrLn resultString
-    let microsecs = fromIntegral (C.toNanoSecs time) / 1000.0 :: Double
-    putStrLn $ "(" ++ show microsecs ++ " μs)"
+    let microsecs = fromIntegral (C.toNanoSecs time) / 1000000.0 :: Double
+    putStrLn $ "(" ++ show microsecs ++ " ms)"
 
 runDay :: (Show a, Show b) => (String -> a) -> [a -> b] -> String -> IO ()
 runDay parse [partOne, partTwo] raw = do
