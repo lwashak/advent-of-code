@@ -23,27 +23,20 @@ parseInput raw = let grid = lines raw
 
 -- Solutions
 partOne :: Input -> Output
-partOne (pss, bounds) = length $ nub $ foldMap (getAntinodes (getMirrorPoints bounds)) pss
+partOne (pss, bounds) = length $ nub $ foldMap (getAntinodes (getLinePoints [1] bounds)) pss
 
 partTwo :: Input -> Output
-partTwo (pss, bounds) = length $ nub $ foldMap (getAntinodes (getResonantPoints bounds)) pss
+partTwo (pss, bounds) = length $ nub $ foldMap (getAntinodes (getLinePoints [0..] bounds)) pss
 
 getAntinodes :: (Point -> Point -> [Point]) -> [Point] -> [Point]
 getAntinodes f as = let antennaPairs = [ (p1,p2) | p1 <- as, p2 <- as, p1 < p2 ]
                         antinodes = foldMap (uncurry f) antennaPairs
                     in antinodes
 
-getMirrorPoints :: (Int, Int) -> Point -> Point -> [Point]
-getMirrorPoints b p1 p2 =
-    let d  = p1 `subtractPoint` p2
-        m1 = p1 `addPoint` d
-        m2 = p2 `subtractPoint` d
-    in filter (isInBounds b) [m1, m2]
-
-getResonantPoints :: (Int, Int) -> Point -> Point -> [Point]
-getResonantPoints b p1 p2 =
+getLinePoints :: [Int] -> (Int, Int) -> Point -> Point -> [Point]
+getLinePoints steps b p1 p2 =
     let d   = p1 `subtractPoint` p2
-        ds  = map (`multiplyPoint` d) [0..]
+        ds  = map (`multiplyPoint` d) steps
         rs1 = takeWhile (isInBounds b) $ map (addPoint p1) ds
         rs2 = takeWhile (isInBounds b) $ map (subtractPoint p2) ds
     in rs1 ++ rs2
