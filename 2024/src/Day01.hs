@@ -1,8 +1,6 @@
-module Day01 (Input, Output, parseInput, partOne, partTwo) where
+module Day01 (Input, Output, parseInput, partOne, partTwo, main) where
 
 import qualified Common as C (insertIntoSorted)
-import Data.Char (isDigit)
-import Data.List (sort, transpose)
 
 -- Types
 type Input = ([Int], [Int])
@@ -37,16 +35,17 @@ getSimilarityScore (x:xs) ys =
     in (x * n) + getSimilarityScore xs ys
 
 getOccurancesForSorted :: Int -> [Int] -> Int
-getOccurancesForSorted _ [] = 0
 getOccurancesForSorted x (y:ys)
     | x > y  = getOccurancesForSorted x ys
     | x == y = 1 + getOccurancesForSorted x ys
     | x < y  = 0
+getOccurancesForSorted _ _ = 0
 
 -- Main
 main :: IO ()
 main = do
     raw <- readFile "../input/Day01.txt"
     let input = parseInput raw
+    print input
     print $ partOne input
     print $ partTwo input

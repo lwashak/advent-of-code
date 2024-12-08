@@ -1,4 +1,4 @@
-module Day08 (main) where
+module Day08 (Input, Output, parseInput, partOne, partTwo, main) where
 
 import Common (findIndices2D)
 

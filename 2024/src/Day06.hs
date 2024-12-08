@@ -1,14 +1,18 @@
-module Day06 () where
+module Day06 (Input, Output, parseInput, partOne, partTwo, main) where
 
-import Data.List (nub, find)
-import Data.Maybe (isJust, isNothing, fromJust)
+import Common (findIndices2D)
+
+import Data.List (nub)
+import Data.Maybe (isNothing, fromJust)
 
 import Data.Set (Set)
-import qualified Data.Set as S (map, member, notMember, fromList, size, insert, empty)
+import qualified Data.Set as S
 
 -- Types
-type Pos = (Int, Int)
+type Input = World
+type Output = Int
 
+type Pos = (Int, Int)
 type Path = [Pos]
 
 data Direction = N | E | S | W
@@ -31,27 +35,20 @@ parseInput raw = World obstacles guardPos guardDir width height
           width     = length $ head grid
           height    = length grid
 
-findCharInGrid :: Pos -> Char -> [[Char]] -> [Pos]
-findCharInGrid _ _ [] = []
-findCharInGrid (i,j) t ([]:css) = findCharInGrid (0,j+1) t css
-findCharInGrid (i,j) t ((c:cs):css)
-    | c == t    = (i,j) : findCharInGrid (i+1, j) t (cs:css)
-    | otherwise = findCharInGrid (i+1, j) t (cs:css)
-
 findObstacles :: [[Char]] -> [Pos]
-findObstacles = findCharInGrid (0,0) '#'
+findObstacles = findIndices2D (=='#')
 
 findGuard :: [[Char]] -> Pos
-findGuard = head . findCharInGrid (0,0) '^'
+findGuard = head . findIndices2D (=='^')
 
 
 -- Solutions
-partOne :: World -> Int
+partOne :: Input -> Output
 partOne w = case walkPatrol S.empty [] w of
     Just path -> length $ nub (guardPos w : path)
     Nothing   -> error "Loop detected"
 
-partTwo :: World -> Int
+partTwo :: Input -> Output
 partTwo w =
     let path = nub $ fromJust $ walkPatrol S.empty [] w
     in findLoops w path
@@ -92,7 +89,7 @@ isLoop :: World -> Bool
 isLoop = isNothing . walkPatrol S.empty []
 
 findLoops :: World -> Path -> Int
-findLoops w [] = 0
+findLoops _ [] = 0
 findLoops w (p:path)
     | isLoop w' = 1 + findLoops w path
     | otherwise = findLoops w path
@@ -107,3 +104,4 @@ main = do
     print input
     print $ partOne input
     print $ partTwo input
+

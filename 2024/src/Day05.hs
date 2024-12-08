@@ -1,11 +1,9 @@
-module Day05 () where
-
-import Common (splitOn)
+module Day05 (Input, Output, parseInput, partOne, partTwo, main) where
 
 import Data.List (sortBy)
 
 import qualified Text.Parsec as P
-import Text.Parsec (Parsec, (<|>))
+import Text.Parsec (Parsec)
 
 -- Types
 type Input = (Rules, [[Int]])
@@ -76,6 +74,6 @@ main :: IO ()
 main = do
     raw <- readFile "../input/Day05.txt"
     let input = parseInput raw
---     print input
+    print input
     print $ partOne input
     print $ partTwo input

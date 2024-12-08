@@ -1,4 +1,4 @@
-module Day07 () where
+module Day07 (Input, Output, parseInput, partOne, partTwo, main) where
 
 import Parsing (readInts)
 
@@ -48,6 +48,6 @@ main :: IO ()
 main = do
     raw <- readFile "../input/Day07.txt"
     let input = parseInput raw
---     print input
+    print input
     print $ partOne input
     print $ partTwo input

@@ -1,9 +1,7 @@
-module Day03 () where
+module Day03 (Input, Output, parseInput, partOne, partTwo, main) where
 
-import Data.Char (isDigit)
-
-import qualified Text.Parsec as P (string, char, digit, many, many1, choice, try, anyToken, putState, getState, manyTill, skipMany, optional, option, lookAhead, parse)
-import Text.Parsec (Parsec, (<|>))
+import qualified Text.Parsec as P
+import Text.Parsec (Parsec)
 
 -- Types
 type Input = [Op]
@@ -35,12 +33,12 @@ mulParser = do
 
 doParser :: Parsec String () Op
 doParser = do
-    P.try $ P.string "do()"
+    _ <- P.try $ P.string "do()"
     return Do
 
 dontParser :: Parsec String () Op
 dontParser = do
-    P.try $ P.string "don't()"
+    _ <- P.try $ P.string "don't()"
     return Dont
 
 operatorParser :: Parsec String () Op
@@ -48,10 +46,10 @@ operatorParser = P.choice [doParser, dontParser, mulParser]
 
 
 -- Solutions
-partOne :: [Op] -> Int
+partOne :: Input -> Output
 partOne ops = sum [ x * y | Mul x y <- ops ]
 
-partTwo :: Input -> Int
+partTwo :: Input -> Output
 partTwo = evaluateProgram True
 
 evaluateProgram :: Bool -> [Op] -> Int
@@ -66,5 +64,6 @@ main :: IO ()
 main = do
     raw <- readFile "../input/Day03.txt"
     let input = parseInput raw
+    print input
     print $ partOne input
     print $ partTwo input
