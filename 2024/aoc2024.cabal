@@ -105,8 +105,8 @@ executable aoc2024
     build-depends:
         base ^>=4.17.2.1,
         clock ^>=0.8.4,
-        aoc2024
 --         pretty ^>=1.1.3.6,
+        aoc2024
 
     -- Directories containing source files.
     hs-source-dirs:   app

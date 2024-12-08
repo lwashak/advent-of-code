@@ -29,25 +29,32 @@ getInputFile :: Int -> String
 getInputFile day = inputDir ++ "Day" ++ dayString ++ ".txt"
     where dayString = if day < 10 then "0" ++ show day else show day
 
-runPart :: (Show a, Show b) => (String -> a) -> (a -> b) -> String -> IO (b, C.TimeSpec)
-runPart parse part raw = do
+timeFunction :: (a -> b) -> a -> IO (b, C.TimeSpec)
+timeFunction f x = do
     start <- C.getTime C.Monotonic
-    let !result = part (parse raw)
+    let !result = f x
     end <- C.getTime C.Monotonic
     return (result, C.diffTimeSpec start end)
 
 printResult :: Show a => (a, C.TimeSpec) -> IO ()
 printResult (result, time) = do
-    let ms = C.toNanoSecs time `div` 1000000
-    putStrLn $ show result ++ "\n(" ++ show ms ++ " ms)"
+    let resultString = show result
+    if length resultString > 200
+       then putStrLn $ take 200 resultString ++ "..."
+       else putStrLn resultString
+    let microsecs = fromIntegral (C.toNanoSecs time) / 1000.0 :: Double
+    putStrLn $ "(" ++ show microsecs ++ " μs)"
 
 runDay :: (Show a, Show b) => (String -> a) -> [a -> b] -> String -> IO ()
 runDay parse [partOne, partTwo] raw = do
-    putStrLn "Part 1: "
-    (r1, t1) <- runPart parse partOne raw
+    putStrLn "Parsed Input: "
+    (input, t0) <- timeFunction parse raw
+    printResult (input, t0)
+    putStrLn "\nPart 1: "
+    (r1, t1) <- timeFunction partOne input
     printResult (r1, t1)
     putStrLn "\nPart 2: "
-    (r2, t2) <- runPart parse partTwo raw
+    (r2, t2) <- timeFunction partTwo input
     printResult (r2, t2)
     return ()
 runDay _ _ _ = error "Day should have 2 parts"
