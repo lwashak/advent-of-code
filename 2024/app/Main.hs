@@ -10,6 +10,9 @@ import qualified Day05
 import qualified Day06
 import qualified Day07
 import qualified Day08
+import qualified Day09
+import qualified Day10
+import qualified Day11
 
 import System.Environment (getArgs)
 import qualified System.Clock as C
@@ -66,13 +69,16 @@ main = do
     raw <- readFile file
     putStrLn $ "----- Day " ++ show day ++ " -----"
     case day of
-        1 -> runDay Day01.parseInput [Day01.partOne, Day01.partTwo] raw
-        2 -> runDay Day02.parseInput [Day02.partOne, Day02.partTwo] raw
-        3 -> runDay Day03.parseInput [Day03.partOne, Day03.partTwo] raw
-        4 -> runDay Day04.parseInput [Day04.partOne, Day04.partTwo] raw
-        5 -> runDay Day05.parseInput [Day05.partOne, Day05.partTwo] raw
-        6 -> runDay Day06.parseInput [Day06.partOne, Day06.partTwo] raw
-        7 -> runDay Day07.parseInput [Day07.partOne, Day07.partTwo] raw
-        8 -> runDay Day08.parseInput [Day08.partOne, Day08.partTwo] raw
+        1  -> runDay Day01.parseInput [Day01.partOne, Day01.partTwo] raw
+        2  -> runDay Day02.parseInput [Day02.partOne, Day02.partTwo] raw
+        3  -> runDay Day03.parseInput [Day03.partOne, Day03.partTwo] raw
+        4  -> runDay Day04.parseInput [Day04.partOne, Day04.partTwo] raw
+        5  -> runDay Day05.parseInput [Day05.partOne, Day05.partTwo] raw
+        6  -> runDay Day06.parseInput [Day06.partOne, Day06.partTwo] raw
+        7  -> runDay Day07.parseInput [Day07.partOne, Day07.partTwo] raw
+        8  -> runDay Day08.parseInput [Day08.partOne, Day08.partTwo] raw
+        9  -> runDay Day09.parseInput [Day09.partOne, Day09.partTwo] raw
+        10 -> runDay Day10.parseInput [Day10.partOne, Day10.partTwo] raw
+        11 -> runDay Day11.parseInput [Day11.partOne, Day11.partTwo] raw
         _ -> error "Invalid Day"
         -- TODO: can we do this dynamically?
