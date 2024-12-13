@@ -13,6 +13,7 @@ import qualified Day08
 import qualified Day09
 import qualified Day10
 import qualified Day11
+import qualified Day12
 
 import System.Environment (getArgs)
 import qualified System.Clock as C
@@ -80,5 +81,6 @@ main = do
         9  -> runDay Day09.parseInput [Day09.partOne, Day09.partTwo] raw
         10 -> runDay Day10.parseInput [Day10.partOne, Day10.partTwo] raw
         11 -> runDay Day11.parseInput [Day11.partOne, Day11.partTwo] raw
+        12 -> runDay Day12.parseInput [Day12.partOne, Day12.partTwo] raw
         _ -> error "Invalid Day"
         -- TODO: can we do this dynamically?
