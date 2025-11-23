@@ -1,4 +1,5 @@
-module Common (splitOn, insertIntoSorted, findIndices2D) where
+module Utils.Common (splitOn, insertIntoSorted, findIndices2D) where
+
 
 -- Matrix / 2D List Operations
 findIndices2D :: Eq a => (a -> Bool) -> [[a]] -> [(Int,Int)]
@@ -24,3 +25,4 @@ insertIntoSorted x (y:ys) =
     if x <= y
     then x:y:ys
     else y : insertIntoSorted x ys
+

@@ -1,9 +1,11 @@
-module Day12 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Data.Array.IArray
+import           Utils.Runner (dayRunner)
 
-import qualified Data.Set as Set
-import Data.Set (Set)
+import           Data.Array.IArray
+
+import           Data.Set          (Set)
+import qualified Data.Set          as Set
 
 -- Types
 type Input = Array (Int, Int) Char
@@ -58,10 +60,6 @@ isInBounds ((rowsMin, colsMin), (rowsMax, colsMax)) (i, j) = i <= rowsMax && i >
 
 
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/example/Day12.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

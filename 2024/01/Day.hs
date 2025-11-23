@@ -1,6 +1,8 @@
-module Day01 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import qualified Common as C (insertIntoSorted)
+import           Utils.Runner (dayRunner)
+
+import qualified Utils.Common as C (insertIntoSorted)
 
 -- Types
 type Input = ([Int], [Int])
@@ -41,11 +43,8 @@ getOccurancesForSorted x (y:ys)
     | x < y  = 0
 getOccurancesForSorted _ _ = 0
 
+
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day01.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

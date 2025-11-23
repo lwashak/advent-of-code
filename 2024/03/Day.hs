@@ -1,7 +1,9 @@
-module Day03 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
+
+import           Utils.Runner (dayRunner)
 
 import qualified Text.Parsec as P
-import Text.Parsec (Parsec)
+import           Text.Parsec (Parsec)
 
 -- Types
 type Input = [Op]
@@ -53,17 +55,13 @@ partTwo :: Input -> Output
 partTwo = evaluateProgram True
 
 evaluateProgram :: Bool -> [Op] -> Int
-evaluateProgram _ [] = 0
-evaluateProgram _ (Do:ops) = evaluateProgram True ops
-evaluateProgram _ (Dont:ops) = evaluateProgram False ops
+evaluateProgram _ []                 = 0
+evaluateProgram _ (Do:ops)           = evaluateProgram True ops
+evaluateProgram _ (Dont:ops)         = evaluateProgram False ops
 evaluateProgram True ((Mul x y):ops) = x * y + evaluateProgram True ops
-evaluateProgram enabled (_:ops) = evaluateProgram enabled ops
+evaluateProgram enabled (_:ops)      = evaluateProgram enabled ops
 
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day03.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

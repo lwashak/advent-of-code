@@ -1,13 +1,15 @@
-module Day11 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
+
+import           Utils.Runner (dayRunner)
 
 -- import qualified Control.Parallel.Strategies as P
 
-import Parsing (readInts)
+import           Utils.Parsing            (readInts)
 -- import Common (applyN)
 
-import Data.List (group, sort, splitAt)
+import           Data.List          (group, sort, splitAt)
 
-import Data.IntMap.Strict (IntMap)
+import           Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as M
 
 -- Types
@@ -35,8 +37,8 @@ blink stones = fst $ M.mapAccumWithKey go M.empty stones
                                         _ -> error "Expecting no more than 2 stones"
 
 addStone :: Int -> Maybe Int -> Maybe Int
-addStone count' Nothing     = Just count'
-addStone count' (Just count)  = Just (count + count')
+addStone count' Nothing      = Just count'
+addStone count' (Just count) = Just (count + count')
 
 mutateStone :: Int -> [Int]
 mutateStone x
@@ -66,11 +68,8 @@ splitStones :: [Int] -> [Int]
 splitStones xs = map digitsToInt [l, r]
     where (l,r) = splitAt (length xs `div` 2) xs
 
+
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day11.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

@@ -1,6 +1,7 @@
-module Day07 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Parsing (readInts)
+import           Utils.Parsing (readInts)
+import           Utils.Runner  (dayRunner)
 
 -- Types
 type Input = [(Int, [Int])]
@@ -43,11 +44,7 @@ solve ops target (x1:x2:xs)
 concatInts :: Int -> Int -> Int
 concatInts x y = read $ show x ++ show y
 
--- -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day07.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+-- Main
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

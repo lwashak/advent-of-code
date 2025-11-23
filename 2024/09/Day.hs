@@ -1,8 +1,10 @@
-module Day09 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Parsing (readDigits)
+import           Utils.Runner (dayRunner)
 
-import Data.Maybe (isJust, fromJust, isNothing)
+import           Utils.Parsing    (readDigits)
+
+import           Data.Maybe (fromJust, isJust, isNothing)
 
 -- Types
 type Input = [Block]
@@ -15,8 +17,8 @@ parseInput :: String -> Input
 parseInput = filter (/=(Nothing, 0)) . getBlocks 0 . readDigits
 
 getBlocks :: Int -> [Int] -> [Block]
-getBlocks _ [] = []
-getBlocks i [n] = [(Just i, n)]
+getBlocks _ []         = []
+getBlocks i [n]        = [(Just i, n)]
 getBlocks i (n1:n2:ns) = (Just i, n1) : (Nothing, n2) : getBlocks (i + 1) ns
 
 -- Solutions
@@ -72,11 +74,8 @@ computeChecksum pos ((Nothing, n): xs) = computeChecksum (pos + n) xs
 computeChecksum pos ((Just i, n): xs) = checksum + computeChecksum (pos + n) xs
     where checksum = sum $ zipWith (*) (replicate n i) [pos..]
 
+
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day09.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

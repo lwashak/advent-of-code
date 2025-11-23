@@ -1,9 +1,11 @@
-module Day10 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Data.Array.IArray
+import           Utils.Runner (dayRunner)
 
-import Data.Char (digitToInt)
-import Data.List (nub)
+import           Data.Array.IArray
+
+import           Data.Char         (digitToInt)
+import           Data.List         (nub)
 
 -- Types
 type Input = Grid
@@ -45,11 +47,8 @@ getNeighbours grid (i, j) = filter isValidNeighbour [(i+1,j),(i,j+1),(i-1,j),(i,
 isInBounds :: ((Int, Int), (Int, Int)) -> (Int, Int) -> Bool
 isInBounds ((rowsMin, colsMin), (rowsMax, colsMax)) (i, j) = i <= rowsMax && i >= rowsMin && j <= colsMax && j >= colsMin
 
+
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/example/Day10.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

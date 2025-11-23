@@ -1,8 +1,10 @@
-module Day13 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Parsing (readInts)
+import           Utils.Runner (dayRunner)
 
-import Data.Maybe (mapMaybe)
+import           Utils.Parsing    (readInts)
+
+import           Data.Maybe (mapMaybe)
 
 -- Types
 type Input = [Claw]
@@ -53,11 +55,8 @@ solveClaw (Claw a b c) =
 dotProduct :: (Int, Int) -> (Int, Int) -> Int
 dotProduct (a_x, a_y) (b_x, b_y) = (a_x * b_y) - (b_x * a_y)
 
+
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "input/example/Day13.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

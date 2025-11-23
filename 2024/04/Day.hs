@@ -1,6 +1,8 @@
-module Day04 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Data.List (transpose)
+import           Utils.Runner (dayRunner)
+
+import           Data.List (transpose)
 
 -- Types
 type Input = Matrix
@@ -22,10 +24,10 @@ partOne m = let rs = getRows m
             in sum (map countXmas toSearch)
 
 countXmas :: String -> Int
-countXmas "" = 0
+countXmas ""                   = 0
 countXmas ('X':'M':'A':'S':cs) = 1 + countXmas ('S':cs)
 countXmas ('S':'A':'M':'X':cs) = 1 + countXmas ('X':cs)
-countXmas (_:cs) = countXmas cs
+countXmas (_:cs)               = countXmas cs
 
 getColumns :: Matrix -> [String]
 getColumns = transpose
@@ -40,13 +42,13 @@ getDiagonals m =
     in upperDiagonals ++ [getDiagonal m] ++ lowerDiagonals
 
 getUpperDiagonals :: Matrix -> [String]
-getUpperDiagonals [] = []
+getUpperDiagonals []     = []
 getUpperDiagonals ([]:_) = []
 getUpperDiagonals (r:rs) = getDiagonal (r:rs) : getUpperDiagonals rs
 
 getDiagonal :: Matrix -> String
-getDiagonal [] = []
-getDiagonal ([]:_) = []
+getDiagonal []         = []
+getDiagonal ([]:_)     = []
 getDiagonal ((c:_):rs) = c : getDiagonal (map tail rs)
 
 rotate :: Matrix -> Matrix
@@ -77,10 +79,6 @@ isCrossMas _ = False
 
 
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day04.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

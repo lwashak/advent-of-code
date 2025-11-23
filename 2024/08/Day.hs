@@ -1,8 +1,10 @@
-module Day08 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Common (findIndices2D)
+import           Utils.Runner (dayRunner)
 
-import Data.List (nub)
+import           Utils.Common    (findIndices2D)
+
+import           Data.List (nub)
 
 
 --Types
@@ -55,10 +57,6 @@ isInBounds (w,h) (i,j) = i >= 0 && j >= 0 && i < w && j < h
 
 
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day08.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

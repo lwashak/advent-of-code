@@ -1,4 +1,6 @@
-module Day02 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
+
+import           Utils.Runner (dayRunner)
 
 -- Types
 type Report = [Int]
@@ -51,11 +53,8 @@ isSafeWithDampener' prevFailure mx0 safe (x1:x2:xs)
         Just x0 -> isSafeWithDampener' True Nothing safe (x0:x2:xs) || isSafeWithDampener' True Nothing safe (x0:x1:xs)
         Nothing -> isSafeWithDampener' True Nothing safe (x2:xs)    || isSafeWithDampener' True Nothing safe (x1:xs)
 
+
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day02.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
+

@@ -1,12 +1,14 @@
-module Day06 (Input, Output, parseInput, partOne, partTwo, main) where
+module Day where
 
-import Common (findIndices2D)
+import           Utils.Runner (dayRunner)
 
-import Data.List (nub)
-import Data.Maybe (isNothing, fromJust)
+import           Utils.Common     (findIndices2D)
 
-import Data.Set (Set)
-import qualified Data.Set as S
+import           Data.List  (nub)
+import           Data.Maybe (fromJust, isNothing)
+
+import           Data.Set   (Set)
+import qualified Data.Set   as S
 
 -- Types
 type Input = World
@@ -19,10 +21,10 @@ data Direction = N | E | S | W
     deriving (Show, Read, Eq, Ord)
 
 data World = World { obstacles :: Set Pos
-                   , guardPos :: Pos
-                   , guardDir :: Direction
-                   , width :: Int
-                   , height :: Int
+                   , guardPos  :: Pos
+                   , guardDir  :: Direction
+                   , width     :: Int
+                   , height    :: Int
                    } deriving (Show, Read)
 
 -- Parsing
@@ -97,11 +99,6 @@ findLoops w (p:path)
           w' = w { obstacles=os' }
 
 -- Main
-main :: IO ()
-main = do
-    raw <- readFile "../input/Day06.txt"
-    let input = parseInput raw
-    print input
-    print $ partOne input
-    print $ partTwo input
+main :: IO [()]
+main = dayRunner parseInput partOne partTwo
 

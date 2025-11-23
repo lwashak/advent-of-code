@@ -1,6 +1,6 @@
-module Parsing (readInts, readDigits) where
+module Utils.Parsing (readInts, readDigits) where
 
-import Data.Char (isDigit, digitToInt)
+import           Data.Char (digitToInt, isDigit)
 
 readInts :: String -> [Int]
 readInts "" = []
@@ -14,3 +14,4 @@ readDigits "" = []
 readDigits (c:cs)
     | isDigit c = digitToInt c : readDigits cs
     | otherwise = readDigits cs
+
