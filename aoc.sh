@@ -100,7 +100,7 @@ generateDay(){
   CONTENT=`cat <<EOF
 module Day where
 
-import Advent (dayRunner)
+import Utils.Runner (dayRunner)
 
 -- Types
 type Input = $INPUT
@@ -141,11 +141,11 @@ EOF
     echo "Skipping already existing Day.hs file..."
   fi
 
-  if [ ! -f README.md ]; then
-    echo "## Day $DAY_2D" > README.md
-  else
-    echo "Skipping already existing README.md file..."
-  fi
+  # if [ ! -f README.md ]; then
+  #   echo "## Day $DAY_2D" > README.md
+  # else
+  #   echo "Skipping already existing README.md file..."
+  # fi
 
   if [ ! -f input ]; then
     if [ "$DOWNLOAD" == true ] && [ -n "$AOC_SESSION" ]; then
