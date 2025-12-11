@@ -50,6 +50,10 @@ OPERATION:
     EXAMPLE:
       ./aoc.sh run -y 2025 -d 1 parse one two input
 
+  ghci <ARGS>                 Start a GHCi REPL with the given day loaded
+    EXAMPLE
+      ./aoc.sh ghci -y 2025 -d 1
+
   clean                       Delete all compiled *.hi, *.o and Day binaries
 
   format                      Format all Haskell source files
@@ -177,6 +181,18 @@ runDay() {
   ./Day $@
 }
 
+dayGhci() {
+   if [ ! -d "$DAY_DIR" ]; then
+    echo "Error: $DAY_DIR doesn't exist yet!"
+    exit 1
+  fi
+  cd "$DAY_DIR"
+
+  echo "Starting GHCi for $YEAR Day $DAY_2D..."
+
+  ghci Day.hs ../../Utils/*.hs
+}
+
 deleteCompiled() {
   echo "Deleting..."
   find . -regextype posix-extended -regex '.*\.(hi|o)$' -print -delete
@@ -191,6 +207,7 @@ formatHaskell() {
 case $1 in
   new) shift; generateDay $@;;
   run) shift; runDay $@;;
+  ghci) shift; dayGhci $@;;
   clean) deleteCompiled $@;;
   format) formatHaskell $@;;
   *) showHelp; exit 1;;
