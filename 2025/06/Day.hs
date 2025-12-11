@@ -2,38 +2,46 @@ module Day where
 
 import Utils.Runner (dayRunner)
 import Data.List (transpose)
-import Utils.Numbers (intToDigits, digitsToInt)
-import Debug.Trace
 
 -- Types
-type Problem = ([Int], Char)
+type Problem = (Char, [Int])
 
-type Input = ([[Int]], [Char])
+type Input = [(Char, [[Char]])]
 type Output = Int
 
--- Parsing
-parseInput :: String -> Input
-parseInput input =
-  let wordsInLines = map words . lines $ input
-      numbers = transpose . map (map read) . init $ wordsInLines
-      operators = map head . last $ wordsInLines
-  in (numbers, operators)
+-- -- Parsing
+parseInput:: String -> Input
+parseInput input = zip operators digits
+  where blocks = parseBlocks [] . lines $ input
+        operators = map (head . last) blocks
+        digits = map init blocks
+
+parseBlocks :: [[Char]] -> [String] -> [[[Char]]]
+parseBlocks acc ([]:_) = [acc]
+parseBlocks acc ls
+  | all (==' ') cs = acc : parseBlocks [] ls'
+  | otherwise = parseBlocks acc' ls'
+  where cs = map head ls
+        ls' = map tail ls
+        acc' = case acc of
+          [] -> map (:[]) cs
+          _  -> zipWith (++) acc (map (:[]) cs)
 
 -- Solutions
 solveProblem :: Problem -> Int
-solveProblem (xs, '+') = sum xs
-solveProblem (xs, '*') = product xs
+solveProblem ('+', xs) = sum xs
+solveProblem ('*', xs) = product xs
 solveProblem _ = error "Unknown operator"
 
-getColumns :: [Int] -> [Int]
-getColumns = map digitsToInt . reverse . transpose . map intToDigits
-
 partOne :: Input -> Output
-partOne (xss, ops) = sum $ zipWith (curry solveProblem) xss ops
+partOne input = sum . map solveProblem $ problems
+  where numbers = map (map (read . filter (/=' ')) . snd) input
+        problems = zip (map fst input) numbers
 
 partTwo :: Input -> Output
-partTwo (xss, ops) = sum $ zipWith (curry solveProblem) (trace (show numbers) numbers) ops
-  where numbers = map getColumns xss  -- TODO - bugged because need to account for alignment in columns :(
+partTwo input = sum . map solveProblem $ problems
+  where numbers = map (map (read . filter (/=' ')) . reverse . transpose . snd) input
+        problems = zip (map fst input) numbers
 
 -- Main
 main :: IO [()]
