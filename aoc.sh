@@ -190,7 +190,7 @@ dayGhci() {
 
   echo "Starting GHCi for $YEAR Day $DAY_2D..."
 
-  ghci Day.hs ../../Utils/*.hs
+  ghci Day.hs ../../Utils/*.hs -O2
 }
 
 deleteCompiled() {
